@@ -1,11 +1,12 @@
-/* Relayed deleting old logs to the GUI system. */
 
-CREATE TABLE "logs" (
-  "change_type" varchar NOT NULL,
-  "date" timestamp NOT NULL
+CREATE TABLE "log" (
+  "id" SERIAL PRIMARY KEY,
+  "changed_data" varchar NOT NULL,
+  "changed_table" varchar NOT NULL,
+  "changed_date" timestamp NOT NULL
 );
 
-CREATE TABLE "user_factors" (
+CREATE TABLE "user_factor" (
   "id" SERIAL PRIMARY KEY,
   "user" varchar,
   "address" varchar,
@@ -14,67 +15,95 @@ CREATE TABLE "user_factors" (
   "date" timestamp NOT NULL
 );
 
-/* CREATE TABLE "user_factors_logs" (
-  "id" PRIMARY KEY
-); */
+CREATE TABLE "user_factors_log" (
+) inherits ("log");
 
-CREATE TABLE "user_factors_items" (
-  "factor" int,
+CREATE TABLE "user_factors_item" (
+  "id" SERIAL PRIMARY KEY,
+  "factor" int NOT NULL,
   "item" varchar NOT NULL,
-  "price_per" int,
-  "count" int,
-  PRIMARY KEY ("factor", "item")
+  "price_per" int NOT NULL,
+  "count" int NOT NULL,
 );
 
-CREATE TABLE "human" (
+CREATE TABLE "user_factors_items_log" (
+) inherits ("log");
+
+CREATE TABLE "delivery" (
   "ssn" varchar PRIMARY KEY,
   "name" varchar NOT NULL,
   "surname" varchar NOT NULL,
   "phone" varchar NOT NULL
 );
 
-CREATE TABLE "deliveries" (
-) inherits ("human");
+CREATE TABLE "delivery_log" (
+) inherits ("log");
 
-CREATE TABLE "customers" (
+CREATE TABLE "customer" (
+  "ssn" varchar PRIMARY KEY,
+  "name" varchar NOT NULL,
+  "surname" varchar NOT NULL,
+  "phone" varchar NOT NULL,
   "age" int NOT NULL
-) inherits ("human");
+);
 
-CREATE TABLE "addresses" (
+CREATE TABLE "customer_log" (
+) inherits ("log");
+
+CREATE TABLE "address" (
   "id" SERIAL PRIMARY KEY,
   "name" varchar NOT NULL,
-  "str" varchar NOT NULL,
+  "address" varchar NOT NULL,
   "phone" varchar NOT NULL
 );
 
-/* ‌Need to check if user's desired food exists in food items or not. */
+CREATE TABLE "address_log" (
+) inherits ("log");
 
-CREATE TABLE "item" (
+
+CREATE TABLE "menu_food" (
   "name" varchar PRIMARY KEY,
-  "price" int
+  "price" int NOT NULL
 );
+
+CREATE TABLE "menu_food_log" (
+) inherits ("log");
 
 CREATE TABLE "store" (
   "name" varchar PRIMARY KEY,
-  "is_active" boolean
+  "is_active" boolean NOT NULL
 );
+
+CREATE TABLE "store_log" (
+) inherits ("log");
 
 CREATE TABLE "shopping_factor" (
   "id" int PRIMARY KEY,
-  "store" varchar,
+  "store" varchar NOT NULL,
   "item" varchar NOT NULL,
   "price" int NOT NULL
 );
 
-ALTER TABLE "user_factors" ADD FOREIGN KEY ("user") REFERENCES "customers" ("ssn");
+CREATE TABLE "shopping_factor_log" (
+) inherits ("log");
 
-ALTER TABLE "user_factors" ADD FOREIGN KEY ("delivery") REFERENCES "deliveries" ("ssn");
+ALTER TABLE "user_factor" ADD FOREIGN KEY ("user") REFERENCES "customer" ("ssn") ON DELETE CASCADE;
 
-ALTER TABLE "user_factors_logs" ADD FOREIGN KEY ("id") REFERENCES "user_factors" ("id");
+ALTER TABLE "user_factor" ADD FOREIGN KEY ("delivery") REFERENCES "delivery" ("ssn");
 
-ALTER TABLE "user_factors_items" ADD FOREIGN KEY ("factor") REFERENCES "user_factors" ("id");
+ALTER TABLE "user_factors_item" ADD FOREIGN KEY ("factor") REFERENCES "user_factor" ("id");
 
 ALTER TABLE "shopping_factor" ADD FOREIGN KEY ("store") REFERENCES "store" ("name");
 
-ALTER TABLE "human" ADD (CONSTRAINT "iran_phone" CHECK ("phone" ~ $$^(\+98|0)?9\d{9}$$));
-ALTER TABLE "human" ADD (CONSTRAINT "numeric_ssn" CHECK ("ssn" ~ $$^[0-9]+$$));
+CREATE PROCEDURE remove_old_log()
+AS $$
+BEGIN
+    DELETE FROM "log"
+    WHERE "changed_date" < now () - interval '3 days';
+END;
+$$
+LANGUAGE plpgsql;
+
+/*
+Create trigger to disable store and disable it instead.
+*/
