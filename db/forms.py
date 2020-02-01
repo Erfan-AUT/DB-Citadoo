@@ -7,6 +7,7 @@ from django.utils.encoding import smart_str
 from django.db.models import Count, Sum
 from django.db import connection
 from django.utils import timezone
+import datetime
 
 class UserFactorItemsForm(forms.ModelForm):
 
@@ -59,9 +60,9 @@ class RestaurantReportForm(forms.Form):
 
     # For today!
     def save(self):
-        today = date.today()
-        user_factors = list(UserFactor.objects.filter(date__date=today))
-        shopping_factors = list(ShoppingFactor.objects.filter(date__date=today))
+        yesterday = date.today() - datetime.timedelta(days=1)
+        user_factors = list(UserFactor.objects.filter(date__gt=yesterday))
+        shopping_factors = list(ShoppingFactor.objects.filter(date__gt=yesterday))
         user_buys = [factor.total_price for factor in user_factors]
         store_buys = [factor.price for factor in shopping_factors]
         sum_user_buys = sum(user_buys)

@@ -20,7 +20,7 @@ class Address(models.Model):
         managed = False
     
     def __str__(self):
-        return str(self.user) + ": " + self.name
+        return ": " + self.name
     
     def save(self, *args, **kwargs):
         is_created = True
@@ -186,11 +186,14 @@ class MenuFoodLog(models.Model):
 
 
 class ShoppingFactor(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     store = models.ForeignKey('Store', models.DO_NOTHING, db_column='store', null=False)
     item = models.CharField(max_length=255)
     price = models.IntegerField()
     date = models.DateTimeField()
+
+    def __str__(self):
+        return self.store.name + " " + self.item + " " + str(self.date)
 
     class Meta:
         db_table = 'shopping_factor'
@@ -228,6 +231,9 @@ class Store(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(unique=True, max_length=255, null=False)
     is_active = models.BooleanField(null=False, default=True)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'store'
