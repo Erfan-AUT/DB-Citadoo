@@ -17,7 +17,6 @@ class Address(models.Model):
     class Meta:
         verbose_name_plural = "addresses"
         db_table = 'address'
-        managed = False
     
     def __str__(self):
         return str(self.user) + ": " + self.name
@@ -48,7 +47,6 @@ class AddressLog(models.Model):
 
     class Meta:
         db_table = 'address_log'
-        managed = False
 
 
 class Customer(models.Model):
@@ -60,7 +58,6 @@ class Customer(models.Model):
 
     class Meta:
         db_table = 'customer'
-        managed = False
 
     def __str__(self):
         return str(self.ssn) + " " + self.name + " " + self.surname
@@ -89,7 +86,7 @@ class CustomerLog(models.Model):
     change_type =  models.CharField(max_length=255)
 
     class Meta:
-        managed = False
+        
         db_table = 'customer_log'
 
 
@@ -100,9 +97,8 @@ class Delivery(models.Model):
     phone = models.CharField(max_length=255)
 
     class Meta:
-        managed = False
+        
         db_table = 'delivery'
-        verbose_name_plural = "deliveries"
     
     def __str__(self):
         return self.name + " " + self.surname
@@ -131,7 +127,6 @@ class DeliveryLog(models.Model):
 
     class Meta:
         db_table = 'delivery_log'
-        managed = False
 
 
 class Log(models.Model):
@@ -141,7 +136,6 @@ class Log(models.Model):
 
     class Meta:
         db_table = 'log'
-        managed = False
 
 
 class MenuFood(models.Model):
@@ -150,7 +144,6 @@ class MenuFood(models.Model):
 
     class Meta:
         db_table = 'menu_food'
-        managed = False
     
     def __str__(self):
         return self.name + ": " + str(self.price)
@@ -181,7 +174,6 @@ class MenuFoodLog(models.Model):
 
     class Meta:
         db_table = 'menu_food_log'
-        managed = False
     
 
 
@@ -194,7 +186,6 @@ class ShoppingFactor(models.Model):
 
     class Meta:
         db_table = 'shopping_factor'
-        managed = False
     
     def save(self, *args, **kwargs):
         is_created = True
@@ -221,7 +212,6 @@ class ShoppingFactorLog(models.Model):
 
     class Meta:
         db_table = 'shopping_factor_log'
-        managed = False
 
 
 class Store(models.Model):
@@ -231,7 +221,6 @@ class Store(models.Model):
 
     class Meta:
         db_table = 'store'
-        managed = False
 
     def delete(self):
         self_str = str(self)
@@ -260,7 +249,6 @@ class StoreLog(models.Model):
 
     class Meta:
         db_table = 'store_log'
-        managed = False
 
 
 class UserFactor(models.Model):
@@ -272,7 +260,6 @@ class UserFactor(models.Model):
 
     class Meta:
         db_table = 'user_factor'
-        managed = False
     
     def __str__(self):
         return str(self.id) + " " +  none_to_empty(str(self.user)) + " " + none_to_empty(str(self.address))
@@ -284,9 +271,9 @@ class UserFactor(models.Model):
         self_str = str(self)
         super(UserFactor, self).save(*args, **kwargs)
         if is_created: 
-            create_proper_log(UserFactorsLog, self_str, "Insert")
+            create_proper_log(UserFactor, self_str, "Insert")
         else:
-            create_proper_log(UserFactorsLog, self_str, "Update")
+            create_proper_log(UserFactor, self_str, "Update")
     
     def delete(self):
         self_str = str(self)
@@ -302,7 +289,6 @@ class UserFactorsLog(models.Model):
 
     class Meta:
         db_table = 'user_factors_log'
-        managed = False
 
 
 
@@ -316,7 +302,6 @@ class UserFactorsItem(models.Model):
     class Meta:
         db_table = 'user_factors_item'
         unique_together = (('factor', 'item'),)
-        managed = False
     
     def save(self, *args, **kwargs):
         is_created = True
@@ -325,9 +310,9 @@ class UserFactorsItem(models.Model):
         self_str = str(self)
         super(UserFactorsItem, self).save(*args, **kwargs)
         if is_created: 
-            create_proper_log(UserFactorsItemsLog, self_str, "Insert")
+            create_proper_log(UserFactorsItemLog, self_str, "Insert")
         else:
-            create_proper_log(UserFactorsItemsLog, self_str, "Update")
+            create_proper_log(UserFactorsLog, self_str, "Update")
     
     def delete(self):
         self_str = str(self)
@@ -343,4 +328,3 @@ class UserFactorsItemsLog(models.Model):
 
     class Meta:
         db_table = 'user_factors_items_log'
-        managed = False

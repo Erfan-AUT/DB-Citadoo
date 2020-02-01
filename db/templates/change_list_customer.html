@@ -1,0 +1,18 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+
+{% block object-tools-items %}
+  {{ block.super }}
+  <li>
+    <a href="{% url "admin:db_export_restaurant_report" %}" class="addlink">
+      {% trans "Restaurant Report" %}
+    </a>
+  </li>
+  <li>
+    <a href="{% url "admin:db_export_customer_report" %}" class="addlink">
+        {% trans "Customer Report" %}
+      </a>
+  </li>
+{% endblock %}
+
